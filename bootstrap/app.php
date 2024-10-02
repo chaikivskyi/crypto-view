@@ -21,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'limit.body' => \App\Http\Middleware\LimitRequestBody::class,
             'restrict.trading-view.ip' => \App\Http\Middleware\RestrictTradingViewIps::class,
         ]);
+
+        $middleware->trustProxies(at: '*');
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
