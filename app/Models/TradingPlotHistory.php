@@ -25,6 +25,13 @@ class TradingPlotHistory extends Model
 
     protected $fillable = ['plot_data', 'ticker', 'exchange', 'state', 'client_ip'];
 
+    public function plotData(): Attribute
+    {
+        return Attribute::make(
+            set: fn (array $value) => json_encode(array_filter($value, fn ($value) => !is_null($value) && is_numeric($value))),
+        );
+    }
+
     public function minPlotValue(): Attribute
     {
         return Attribute::make(

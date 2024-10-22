@@ -16,11 +16,7 @@ class AlertHookRequest extends FormRequest
         $rules = [];
 
         for ($i = 0; $i <= self::MAX_PLOT_INDEX; $i++) {
-            $rules['plot_data.plot_' . $i] = ['numeric'];
-
-            if ($i < 2) {
-                $rules['plot_data.plot_' . $i][] = 'required';
-            }
+            $rules['plot_data.plot_' . $i] = ['sometimes', 'numeric', 'nullable'];
         }
 
         $rules = array_merge(
