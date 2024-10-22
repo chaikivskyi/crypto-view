@@ -7,26 +7,29 @@ use App\Helper\MathHelper;
 use App\Http\Requests\AlertHookRequest;
 use App\Jobs\ProcessWebhook;
 use App\Models\TradingPlotHistory;
+use App\Settings\GeneralSettings;
 
 class AlertController extends Controller
 {
-    private const MIN_DIFFERENCE_PERCENT = 5;
-
-    public function process(AlertHookRequest $request)
+    public function process(AlertHookRequest $request, GeneralSettings $settings)
     {
-        $webhook = TradingPlotHistory::create([
-            'plot_one_value' => $request->post('plot_one'),
-            'plot_two_value' => $request->post('plot_two'),
+        $tradingPlotHistory = TradingPlotHistory::create([
+            'plot_data' => $request->post('plot_data'),
             'ticker' => $request->post('ticker', ''),
             'exchange' => $request->post('exchange', ''),
             'state' => WebhookStateEnum::Pending->value,
             'client_ip' => $request->ip(),
         ]);
 
-        if (MathHelper::percentageDifference($webhook->plot_one_value, $webhook->plot_two_value) > self::MIN_DIFFERENCE_PERCENT) {
-            ProcessWebhook::dispatch($webhook);
+        $changePercent = MathHelper::percentageDifference(
+            $tradingPlotHistory->min_plot_value,
+            $tradingPlotHistory->max_plot_value
+        );
+dd($settings->changePercentage);
+        if ($changePercent > $settings->changePercentage) {
+            ProcessWebhook::dispatch($tradingPlotHistory);
         } else {
-            $webhook->update(['state' => WebhookStateEnum::Canceled->value]);
+            $tradingPlotHistory->update(['state' => WebhookStateEnum::Canceled->value]);
         }
 
         return response()->json(['message' => 'Webhook process added to queue.']);

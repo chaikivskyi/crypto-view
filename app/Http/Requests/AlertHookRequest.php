@@ -9,20 +9,36 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AlertHookRequest extends FormRequest
 {
+    private const MAX_PLOT_INDEX = 19;
+
     public function rules(): array
     {
-        return [
-            'plot_one' => ['required', 'numeric'],
-            'plot_two' => ['required', 'numeric'],
-            'ticker' => ['string', 'nullable'],
-            'exchange' => ['string', 'nullable'],
-        ];
+        $rules = [];
+
+        for ($i = 0; $i <= self::MAX_PLOT_INDEX; $i++) {
+            $rules['plot_data.plot_' . $i] = ['numeric'];
+
+            if ($i < 2) {
+                $rules['plot_data.plot_' . $i][] = 'required';
+            }
+        }
+
+        $rules = array_merge(
+            $rules,
+            [
+                'plot_data' => ['required', 'array'],
+                'ticker' => ['string', 'nullable'],
+                'exchange' => ['string', 'nullable']
+            ]
+        );
+
+        return $rules;
     }
 
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([
-            'message' => 'Invalid request data',
+            'message' => 'Invalid webhook request data',
             'errors' => $validator->errors(),
         ], Response::HTTP_BAD_REQUEST));
     }
