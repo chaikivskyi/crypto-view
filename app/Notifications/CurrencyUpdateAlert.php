@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Helper\MathHelper;
 use App\Models\TradingPlotHistory;
+use App\Settings\GeneralSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
@@ -13,6 +14,10 @@ class CurrencyUpdateAlert extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    public function __construct(protected GeneralSettings $settings)
+    {
+    }
+
     public function via(object $notifiable): array
     {
         return ['telegram'];
@@ -20,7 +25,7 @@ class CurrencyUpdateAlert extends Notification implements ShouldQueue
 
     public function toTelegram(TradingPlotHistory $notifiable): TelegramMessage
     {
-        $route = $notifiable->routes['telegram'] ?? config()->string('services.telegram-bot-api.chat_id');
+        $route = $this->settings->telegramChatId;
         $percentageDiff = MathHelper::percentageDifference($notifiable->plot_one_value, $notifiable->plot_two_value);
 
         return TelegramMessage::create()

@@ -2,5 +2,6 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    NotificationChannels\Telegram\TelegramServiceProvider::class
+    App\Providers\Filament\AdminPanelProvider::class,
+    App\Providers\TelegramServiceProvider::class,
 ];
