@@ -23,7 +23,7 @@ class ProcessWebhook implements ShouldQueue
     public function handle(): void
     {
         try {
-            $this->webhook->notifyNow(new CurrencyUpdateAlert(), ['telegram']);
+            $this->webhook->notifyNow(app(CurrencyUpdateAlert::class), ['telegram']);
             $this->webhook->update(['state' => WebhookStateEnum::Processed->value]);
         } catch (Throwable $e) {
             $this->webhook->update(['state' => WebhookStateEnum::Failed->value]);

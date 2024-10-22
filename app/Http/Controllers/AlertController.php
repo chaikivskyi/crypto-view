@@ -13,7 +13,7 @@ class AlertController extends Controller
 {
     public function process(AlertHookRequest $request, GeneralSettings $settings)
     {
-        $tradingPlotHistory = TradingPlotHistory::create([
+        $webhook = TradingPlotHistory::create([
             'plot_data' => $request->post('plot_data'),
             'ticker' => $request->post('ticker', ''),
             'exchange' => $request->post('exchange', ''),
@@ -22,14 +22,14 @@ class AlertController extends Controller
         ]);
 
         $changePercent = MathHelper::percentageDifference(
-            $tradingPlotHistory->min_plot_value,
-            $tradingPlotHistory->max_plot_value
+            $webhook->avg_plot_value,
+            $webhook->max_plot_value
         );
-dd($settings->changePercentage);
+
         if ($changePercent > $settings->changePercentage) {
-            ProcessWebhook::dispatch($tradingPlotHistory);
+            ProcessWebhook::dispatch($webhook);
         } else {
-            $tradingPlotHistory->update(['state' => WebhookStateEnum::Canceled->value]);
+            $webhook->update(['state' => WebhookStateEnum::Canceled->value]);
         }
 
         return response()->json(['message' => 'Webhook process added to queue.']);

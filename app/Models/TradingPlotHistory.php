@@ -39,6 +39,13 @@ class TradingPlotHistory extends Model
         );
     }
 
+    public function avgPlotValue(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => round(array_sum($this->plot_data) / count($this->plot_data), 2)
+        )->shouldCache();
+    }
+
     public function casts(): array
     {
         return [

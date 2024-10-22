@@ -26,12 +26,13 @@ class CurrencyUpdateAlert extends Notification implements ShouldQueue
     public function toTelegram(TradingPlotHistory $notifiable): TelegramMessage
     {
         $route = $this->settings->telegramChatId;
-        $percentageDiff = MathHelper::percentageDifference($notifiable->min_plot_value, $notifiable->max_plot_value);
+        $percentageDiff = MathHelper::percentageDifference($notifiable->avg_plot_value, $notifiable->max_plot_value);
 
         return TelegramMessage::create()
             ->to($route)
             ->line(sprintf('Min. Value: %s', $notifiable->min_plot_value))
             ->line(sprintf('Max. Value: %s', $notifiable->max_plot_value))
+            ->line(sprintf('Avg. Value: %s', $notifiable->avg_plot_value))
             ->line(sprintf('Difference: *%s%%*', $percentageDiff))
             ->lineIf($notifiable->exchange, sprintf('Exchange: %s', $notifiable->exchange))
             ->lineIf($notifiable->ticker, sprintf('Ticker: %s', $notifiable->ticker));
