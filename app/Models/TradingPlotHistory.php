@@ -19,7 +19,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class TradingPlotHistory extends Model
 {
-    use HasFactory, Notifibable;
+    use HasFactory, Notifiable;
 
     protected $table = 'trading_plot_history';
 
