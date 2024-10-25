@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class AlertHookRequest extends FormRequest
@@ -33,6 +34,10 @@ class AlertHookRequest extends FormRequest
 
     protected function failedValidation(Validator $validator): void
     {
+        Log::info($this->getContent(), [
+            'base_uri' => $this->getBasePath()
+        ]);
+
         throw new HttpResponseException(response()->json([
             'message' => 'Invalid webhook request data',
             'errors' => $validator->errors(),
